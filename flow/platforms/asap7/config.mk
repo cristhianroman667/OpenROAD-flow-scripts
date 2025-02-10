@@ -81,7 +81,7 @@ export DONT_USE_CELLS          += SDF* ICG*
 export LATCH_MAP_FILE          = $(PLATFORM_DIR)/yoSys/cells_latch_R.v
 export CLKGATE_MAP_FILE        = $(PLATFORM_DIR)/yoSys/cells_clkgate_R.v
 export ADDER_MAP_FILE         ?= $(PLATFORM_DIR)/yoSys/cells_adders_R.v
-export MAX_UNGROUP_SIZE       ?= 100
+export MAX_UNGROUP_SIZE       ?= 1000
 
 export ABC_DRIVER_CELL         = BUFx2_ASAP7_75t_R
 
@@ -115,28 +115,27 @@ export IO_PLACER_H             ?= M4
 export IO_PLACER_V             ?= M5
 
 export MACRO_PLACE_HALO        ?= 10 10
-export MACRO_PLACE_CHANNEL     ?= 12 12
 
 # the followings create a keep out / halo between
 # macro and core rows
-export MACRO_HALO_X            ?= 2
-export MACRO_HALO_Y            ?= 2
+export MACRO_ROWS_HALO_X            ?= 2
+export MACRO_ROWS_HALO_Y            ?= 2
 
 export PLACE_DENSITY ?= 0.60
 
 # Endcap and Welltie cells
-export TAPCELL_TCL             = $(PLATFORM_DIR)/openRoad/tapcell.tcl
+export TAPCELL_TCL             ?= $(PLATFORM_DIR)/openRoad/tapcell.tcl
 
 # Fill cells used in fill cell insertion
-export FILL_CELLS              = FILLERxp5_ASAP7_75t_R \
-                                 FILLER_ASAP7_75t_R \
-                                 DECAPx1_ASAP7_75t_R \
-                                 DECAPx2_ASAP7_75t_R \
-                                 DECAPx4_ASAP7_75t_R \
-                                 DECAPx6_ASAP7_75t_R \
-                                 DECAPx10_ASAP7_75t_R
+export FILL_CELLS              ?= FILLERxp5_ASAP7_75t_R \
+                                  FILLER_ASAP7_75t_R \
+                                  DECAPx1_ASAP7_75t_R \
+                                  DECAPx2_ASAP7_75t_R \
+                                  DECAPx4_ASAP7_75t_R \
+                                  DECAPx6_ASAP7_75t_R \
+                                  DECAPx10_ASAP7_75t_R
 
-export TAP_CELL_NAME           = TAPCELL_ASAP7_75t_R
+export TAP_CELL_NAME           ?= TAPCELL_ASAP7_75t_R
 
 export SET_RC_TCL              = $(PLATFORM_DIR)/setRC.tcl
 
@@ -165,9 +164,9 @@ ifeq ($(ASAP7_USELVT), 1)
 
    export ABC_DRIVER_CELL         = BUFx2_ASAP7_75t_L
 
-   export FILL_CELLS              = "FILLERxp5_ASAP7_75t_L"
+   export FILL_CELLS              ?= FILLERxp5_ASAP7_75t_L
 
-   export TAP_CELL_NAME           = TAPCELL_ASAP7_75t_L
+   export TAP_CELL_NAME           ?= TAPCELL_ASAP7_75t_L
 
    export GDS_FILES               = $(PLATFORM_DIR)/gds/asap7sc7p5t_28_L_220121a.gds \
                                      $(ADDITIONAL_GDS)
@@ -214,9 +213,9 @@ ifeq ($(ASAP7_USESLVT), 1)
 
    export ABC_DRIVER_CELL         = BUFx2_ASAP7_75t_SL
 
-   export FILL_CELLS              = "FILLERxp5_ASAP7_75t_SL"
+   export FILL_CELLS              ?= FILLERxp5_ASAP7_75t_SL
 
-   export TAP_CELL_NAME		  = TAPCELL_ASAP7_75t_SL
+   export TAP_CELL_NAME		  ?= TAPCELL_ASAP7_75t_SL
 
    export GDS_FILES               = $(PLATFORM_DIR)/gds/asap7sc7p5t_28_SL_220121a.gds \
 				    $(ADDITIONAL_GDS)
@@ -258,16 +257,7 @@ endif
 # BC - Best case, fastest
 # WC - Worst case, slowest
 # TC - Typical case
-ifeq ($(CORNER),)
-   export CORNER = BC
-ifeq ($(MAKELEVEL),0)
-   $(info Default PVT selection: $(CORNER) model: $(LIB_MODEL))
-endif
-else
-ifeq ($(MAKELEVEL),0)
-   $(info User PVT selection: $(CORNER) model: $(LIB_MODEL))
-endif
-endif
+export CORNER ?= BC
 export LIB_FILES             += $($(CORNER)_$(LIB_MODEL)_LIB_FILES)
 export LIB_FILES             += $(ADDITIONAL_LIBS)
 export DB_FILES              += $(realpath $($(CORNER)_DB_FILES))
@@ -281,8 +271,8 @@ export DONT_USE_SC_LIB        = $(OBJECTS_DIR)/lib/merged.lib
 
 # IR drop estimation supply net name to be analyzed and supply voltage variable
 # For multiple nets: PWR_NETS_VOLTAGES  = "VDD1 1.8 VDD2 1.2"
-export PWR_NETS_VOLTAGES  ?= "VDD $(VOLTAGE)"
-export GND_NETS_VOLTAGES  ?= "VSS 0.0"
+export PWR_NETS_VOLTAGES  ?= VDD $(VOLTAGE)
+export GND_NETS_VOLTAGES  ?= VSS 0.0
 export IR_DROP_LAYER ?= M1
 
 # Allow empty GDS cell

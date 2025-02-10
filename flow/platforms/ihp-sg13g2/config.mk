@@ -4,13 +4,22 @@ export PROCESS = ihp-sg13g2
 #-----------------------------------------------------
 # Tech/Libs
 # ----------------------------------------------------
+# Add IO related files when a TCL script is assigned to 'FOOTPRINT_TCL'.
+# This variable is used to pass IO information.
+ifdef FOOTPRINT_TCL
+  export ADDITIONAL_LEFS += $(PLATFORM_DIR)/lef/sg13g2_io.lef \
+                            $(PLATFORM_DIR)/lef/bondpad_70x70.lef
+  export ADDITIONAL_LIBS += $(PLATFORM_DIR)/lib/sg13g2_io_typ_1p2V_3p3V_25C.lib
+  export ADDITIONAL_GDS += $(PLATFORM_DIR)/gds/sg13g2_io.gds \
+                           $(PLATFORM_DIR)/gds/bondpad_70x70.gds
+endif
 export TECH_LEF = $(PLATFORM_DIR)/lef/sg13g2_tech.lef
 export SC_LEF = $(PLATFORM_DIR)/lef/sg13g2_stdcell.lef
 
 export LIB_FILES = $(PLATFORM_DIR)/lib/sg13g2_stdcell_typ_1p20V_25C.lib \
-	                  $(ADDITIONAL_LIBS)
+                   $(ADDITIONAL_LIBS)
 export GDS_FILES = $(PLATFORM_DIR)/gds/sg13g2_stdcell.gds \
-	                  $(ADDITIONAL_GDS)
+                   $(ADDITIONAL_GDS)
 
 # Dont use cells to ease congestion
 # Specify at least one filler cell if none
@@ -19,15 +28,14 @@ export GDS_FILES = $(PLATFORM_DIR)/gds/sg13g2_stdcell.gds \
 # on all layers.
 # *lpflow* cells are for multi-power domains
 export DONT_USE_CELLS += \
-sg13g2_antennanp \
 sg13g2_lgcp_1 \
 sg13g2_sighold \
 sg13g2_slgcp_1 \
-sg13g2_dfrbp_2 
+sg13g2_dfrbp_2
 
 
 # Define fill cells
-export FILL_CELLS = sg13g2_fill_1 sg13g2_fill_2 sg13g2_decap_4 sg13g2_decap_8
+export FILL_CELLS ?= sg13g2_fill_1 sg13g2_fill_2 sg13g2_decap_4 sg13g2_decap_8
 # -----------------------------------------------------
 #  Yosys
 #  ----------------------------------------------------
@@ -48,6 +56,13 @@ export ABC_DRIVER_CELL = sg13g2_buf_4
 export ABC_LOAD_IN_FF = 6.0
 # Set yosys-abc clock period to first "clk_period" value or "-period" value found in sdc file
 export ABC_CLOCK_PERIOD_IN_PS ?= $(shell sed -nE "s/^set clk_period (.+)|.* -period (.+) .*/\1\2/p" $(SDC_FILE) | head -1 | awk '{print $$1*1000}')
+
+# -----------------------------------------------------
+#  Sizing
+# -----------------------------------------------------
+
+export MATCH_CELL_FOOTPRINT = 1
+
 #--------------------------------------------------------
 # Floorplan
 # -------------------------------------------------------
@@ -63,12 +78,14 @@ export IO_PLACER_V = Metal3
 # Define default PDN config
 export PDN_TCL ?= $(PLATFORM_DIR)/pdn.tcl
 
+# To allow the core rings to fit inside the core area
+export CORE_MARGIN ?= 16.5
+
 # There are no Endcap and Welltie cells in this PDK, so
 # `cut_rows` has to be called from the tapcell script.
-export TAPCELL_TCL = $(PLATFORM_DIR)/tapcell.tcl
+export TAPCELL_TCL ?= $(PLATFORM_DIR)/tapcell.tcl
 
 export MACRO_PLACE_HALO ?= 40 40
-export MACRO_PLACE_CHANNEL ?= 80 80
 
 #---------------------------------------------------------
 # Place
@@ -106,13 +123,16 @@ export RCX_RULES = $(PLATFORM_DIR)/rcx_patterns.rules
 
 # IR drop estimation supply net name to be analyzed and supply voltage variable
 # For multiple nets: PWR_NETS_VOLTAGES  = "VDD1 1.8 VDD2 1.2"
-export PWR_NETS_VOLTAGES  ?= "VDD 1.2"
-export GND_NETS_VOLTAGES  ?= "VSS 0.0"
+export PWR_NETS_VOLTAGES  ?= VDD 1.2
+export GND_NETS_VOLTAGES  ?= VSS 0.0
 export IR_DROP_LAYER ?= Metal1
 
 # DRC Check
-export KLAYOUT_DRC_FILE = $(PLATFORM_DIR)/drc/sg13g2.lydrc
+export KLAYOUT_DRC_FILE ?= $(PLATFORM_DIR)/drc/sg13g2_minimal.lydrc
 
 #LVS Check
-export CDL_FILE = $(PLATFORM_DIR)/cdl/sg13g2_stdcell.cdl
+export CDL_FILE ?= $(PLATFORM_DIR)/cdl/sg13g2_stdcell.cdl
 #export KLAYOUT_LVS_FILE = $(PLATFORM_DIR)/lvs/$(PLATFORM).lylvs
+
+#Temporary: skip post-DRT repair antennas
+export SKIP_ANTENNA_REPAIR_POST_DRT = 1

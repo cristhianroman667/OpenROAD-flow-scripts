@@ -56,7 +56,7 @@ export DONT_USE_CELLS += \
     sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4
 #
 # Define fill cells
-export FILL_CELLS = sky130_fd_sc_hd__fill_1 sky130_fd_sc_hd__fill_2 sky130_fd_sc_hd__fill_4 sky130_fd_sc_hd__fill_8
+export FILL_CELLS ?= sky130_fd_sc_hd__fill_1 sky130_fd_sc_hd__fill_2 sky130_fd_sc_hd__fill_4 sky130_fd_sc_hd__fill_8
 
 # -----------------------------------------------------
 #  Yosys
@@ -77,6 +77,13 @@ export ADDER_MAP_FILE ?= $(PLATFORM_DIR)/cells_adders_hd.v
 # Define ABC driver and load
 export ABC_DRIVER_CELL = sky130_fd_sc_hd__buf_1
 export ABC_LOAD_IN_FF = 5
+
+# -----------------------------------------------------
+#  Sizing
+# -----------------------------------------------------
+
+export MATCH_CELL_FOOTPRINT = 1
+
 #--------------------------------------------------------
 # Floorplan
 # -------------------------------------------------------
@@ -93,10 +100,10 @@ export IO_PLACER_V = met2
 export PDN_TCL ?= $(PLATFORM_DIR)/pdn.tcl
 
 # Endcap and Welltie cells
-export TAPCELL_TCL = $(PLATFORM_DIR)/tapcell.tcl
+export TAP_CELL_NAME = sky130_fd_sc_hd__tapvpwrvgnd_1
+export TAPCELL_TCL ?= $(PLATFORM_DIR)/tapcell.tcl
 
 export MACRO_PLACE_HALO ?= 40 40
-export MACRO_PLACE_CHANNEL ?= 80 80
 
 #---------------------------------------------------------
 # Place
@@ -132,8 +139,8 @@ export RCX_RULES = $(PLATFORM_DIR)/rcx_patterns.rules
 
 # IR drop estimation supply net name to be analyzed and supply voltage variable
 # For multiple nets: PWR_NETS_VOLTAGES  = "VDD1 1.8 VDD2 1.2"
-export PWR_NETS_VOLTAGES  ?= "VDD 1.8"
-export GND_NETS_VOLTAGES  ?= "VSS 0.0"
+export PWR_NETS_VOLTAGES  ?= VDD 1.8
+export GND_NETS_VOLTAGES  ?= VSS 0.0
 export IR_DROP_LAYER ?= met1
 
 # DRC Check

@@ -33,14 +33,14 @@ If you need to use a different Docker image than default, override by using the 
 environment variable:
 
 ```
-OR_IMAGE=openroad/flow-centos7-builder:v1234 util/docker_shell make
+OR_IMAGE=openroad/flow-ubuntu22.04-builder:v1234 util/docker_shell make
 ```
 
-If you have built your OpenROAD Docker image using prebuilt binaries, 
+If you have built your OpenROAD Docker image using prebuilt binaries,
 you might want to source custom paths for your modules as follows.
 
 ```
-OR_IMAGE=openroad_prebuilt_image YOSYS_CMD=/oss-cad-suite/bin/yosys util/docker_shell make
+OR_IMAGE=openroad_prebuilt_image YOSYS_EXE=/oss-cad-suite/bin/yosys util/docker_shell make
 ```
 
 Using `docker_shell` from outside of `OpenROAD-flow-scripts/flow` folder
