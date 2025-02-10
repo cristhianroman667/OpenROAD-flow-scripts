@@ -23,9 +23,9 @@ _installORDependencies() {
 }
 
 _installCommon() {
-    if [[ -f /opt/rh/rh-python38/enable ]]; then
+    if [[ -f ~/software/anaconda3/bin/activate ]]; then
         set +u
-        source /opt/rh/rh-python38/enable
+        source ~/software/anaconda3/bin/activate
         set -u
     fi
     local pkgs="pandas numpy firebase_admin click pyyaml"
@@ -60,6 +60,27 @@ _installCentosPackages() {
         yum install -y https://www.klayout.org/downloads/CentOS_7/klayout-${klayoutVersion}-0.x86_64.rpm
       fi
     fi
+}
+
+_installDebianPackages() {
+    export DEBIAN_FRONTEND="noninteractive"
+    apt-get -y update
+    apt-get -y install \
+        libqt5multimediawidgets5 \
+        libqt5svg5-dev \
+        libqt5xmlpatterns5-dev \
+        libz-dev \
+        python3-pip \
+        qtmultimedia5-dev \
+        qttools5-dev \
+        ruby \
+        ruby-dev \
+        time
+}
+
+_installDebianCleanUp() {
+    apt-get autoclean -y
+    apt-get autoremove -y
 }
 
 _installUbuntuCleanUp() {
@@ -238,6 +259,19 @@ case "${os}" in
         fi
         if [[ "${option}" == "common" || "${option}" == "all" ]]; then
             _installCommon
+        fi
+        ;;
+    "Debian GNU/Linux" )
+        version=$(awk -F= '/^VERSION_ID/{print $2}' /etc/os-release | sed 's/"//g')
+        _installORDependencies
+        if [[ "${option}" == "base" || "${option}" == "all" ]]; then
+            _installDebianPackages ${version}
+            _installDebianCleanUp
+        fi
+        if [[ "${option}" == "common" || "${option}" == "all" ]]; then
+            if _versionCompare ${version} -lt 23.04 ; then
+                _installCommon
+            fi
         fi
         ;;
     *)
